@@ -1,15 +1,24 @@
 import { TreeNode } from '../types';
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function renderProcessFields(node: TreeNode, indent: number): string {
   let html = '';
   const marginStyle = indent > 0 ? ` style="margin-left: ${indent}px;"` : '';
   const pMarginStyle = indent > 0 ? ` style="margin-left: ${indent}px;"` : '';
 
-  if (node.supplies) html += `<div class="box"${marginStyle}><span class="label">준비물</span><pre>${node.supplies}</pre></div>`;
-  if (node.detail) html += `<div class="box"${marginStyle}><span class="label">상세 과정</span><pre>${node.detail}</pre></div>`;
-  if (node.tip) html += `<div class="box"${marginStyle}><span class="label">핵심 노하우</span><pre class="tip">${node.tip}</pre></div>`;
-  if (node.image) html += `<div class="box"${marginStyle}><span class="label">참고 사진</span><img src="${node.image}" style="max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px;" /></div>`;
-  if (node.time) html += `<p${pMarginStyle}><strong>소요 시간:</strong> ${node.time}분</p>`;
+  if (node.supplies) html += `<div class="box"${marginStyle}><span class="label">준비물</span><pre>${escapeHtml(node.supplies)}</pre></div>`;
+  if (node.detail) html += `<div class="box"${marginStyle}><span class="label">상세 과정</span><pre>${escapeHtml(node.detail)}</pre></div>`;
+  if (node.tip) html += `<div class="box"${marginStyle}><span class="label">핵심 노하우</span><pre class="tip">${escapeHtml(node.tip)}</pre></div>`;
+  if (node.image) html += `<div class="box"${marginStyle}><span class="label">참고 사진</span><img src="${escapeHtml(node.image)}" style="max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px;" /></div>`;
+  if (node.time) html += `<p${pMarginStyle}><strong>소요 시간:</strong> ${escapeHtml(node.time)}분</p>`;
 
   return html;
 }
@@ -36,20 +45,20 @@ export function generateManualHTML(data: TreeNode): string {
     }
 
     if (node.level === 0) {
-      html += `<h1>[프로젝트] ${node.title}</h1>`;
+      html += `<h1>[프로젝트] ${escapeHtml(node.title || '')}</h1>`;
     } else if (node.level === 1) {
-      html += `<h2>[담당] ${node.title}</h2>`;
+      html += `<h2>[담당] ${escapeHtml(node.title || '')}</h2>`;
     } else if (node.level === 2) {
-      html += `<h3>대분류: ${node.title}</h3>`;
-      if (node.definition) html += `<div class="box"><span class="label">정의</span><pre>${node.definition}</pre></div>`;
+      html += `<h3>대분류: ${escapeHtml(node.title || '')}</h3>`;
+      if (node.definition) html += `<div class="box"><span class="label">정의</span><pre>${escapeHtml(node.definition)}</pre></div>`;
     } else if (node.level === 3) {
-      html += `<h4>과정: ${node.title}</h4>`;
+      html += `<h4>과정: ${escapeHtml(node.title || '')}</h4>`;
       html += renderProcessFields(node, 0);
     } else if (node.level === 4) {
-      html += `<h5 style="color: #4c1d95; margin-top: 15px; padding-left: 20px;">└ 추가과정: ${node.title}</h5>`;
+      html += `<h5 style="color: #4c1d95; margin-top: 15px; padding-left: 20px;">└ 추가과정: ${escapeHtml(node.title || '')}</h5>`;
       html += renderProcessFields(node, 20);
     } else if (node.level === 5) {
-      html += `<h6 style="color: #be185d; margin-top: 15px; padding-left: 40px;">└ 세부과정: ${node.title}</h6>`;
+      html += `<h6 style="color: #be185d; margin-top: 15px; padding-left: 40px;">└ 세부과정: ${escapeHtml(node.title || '')}</h6>`;
       html += renderProcessFields(node, 40);
     }
 

@@ -18,6 +18,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ data, onClose, onDataI
     link.href = url;
     link.download = `세이토_매뉴얼_GoogleDocs용_${new Date().toISOString().split('T')[0]}.doc`;
     link.click();
+    URL.revokeObjectURL(url);
     onClose();
   };
 
@@ -41,7 +42,19 @@ export const ExportModal: React.FC<ExportModalProps> = ({ data, onClose, onDataI
     link.href = url;
     link.download = `세이토_백업데이터_${new Date().toISOString().split('T')[0]}.json`;
     link.click();
+    URL.revokeObjectURL(url);
     onClose();
+  };
+
+  const validateTreeNode = (node: unknown): node is TreeNode => {
+    if (!node || typeof node !== 'object') return false;
+    const n = node as Record<string, unknown>;
+    if (typeof n.id !== 'string' || typeof n.level !== 'number') return false;
+    if (n.children !== undefined) {
+      if (!Array.isArray(n.children)) return false;
+      if (!n.children.every(validateTreeNode)) return false;
+    }
+    return true;
   };
 
   const importDataFromJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,12 +64,15 @@ export const ExportModal: React.FC<ExportModalProps> = ({ data, onClose, onDataI
     reader.onload = (event) => {
       try {
         const importedData = JSON.parse(event.target!.result as string);
-        if (importedData && importedData.id === 'system_root') {
+        if (importedData && importedData.id === 'system_root' && validateTreeNode(importedData)) {
           onDataImport(importedData);
           onClose();
+        } else {
+          alert('올바른 세이토 백업 파일이 아닙니다.');
         }
       } catch (err) {
         console.error("파일 읽기 실패", err);
+        alert('파일을 읽을 수 없습니다.');
       }
     };
     reader.readAsText(file);

@@ -3,7 +3,6 @@ import { Plus, Layout, FolderTree, FileDown, X, CloudUpload, Check, Cloud, Activ
 import { TreeNode } from '../types';
 import { SaveStatus } from '../types';
 import { TreeNodeComponent } from './TreeNode';
-import { supabase } from '../supabase';
 
 interface SidebarProps {
   data: TreeNode;
@@ -23,13 +22,14 @@ interface SidebarProps {
   onTabChange: (tab: 'editor' | 'dashboard') => void;
   onExportOpen: () => void;
   onMobileMenuClose: () => void;
+  onSignOut: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   data, selectedNodeId, draggedNodeId, saveStatus, leftWidth,
   isMobile, isMobileMenuOpen, activeTab, onTabChange,
   onSelect, onToggle, onAdd, onDragStart, onDragOver, onDrop,
-  onExportOpen, onMobileMenuClose,
+  onExportOpen, onMobileMenuClose, onSignOut,
 }) => {
   const treeProps = { selectedNodeId, draggedNodeId, onSelect, onToggle, onAdd, onDragStart, onDragOver, onDrop };
 
@@ -109,7 +109,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ) : (
             <span className="text-[10px] text-slate-400 font-bold"><Cloud size={12} className="inline mr-1"/> 대기중</span>
           )}
-          <button onClick={() => supabase.auth.signOut()} className="hidden md:block p-1.5 hover:bg-red-500 hover:text-white rounded-lg transition-all text-slate-400">
+          <button onClick={onSignOut} className="hidden md:block p-1.5 hover:bg-red-500 hover:text-white rounded-lg transition-all text-slate-400">
             <LogOut size={14} />
           </button>
         </div>

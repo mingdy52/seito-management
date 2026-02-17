@@ -220,7 +220,7 @@ const App = () => {
           <button onClick={() => setIsExportModalOpen(true)} className="p-2 bg-slate-100 hover:bg-blue-600 hover:text-white rounded-lg transition-all text-slate-600">
             <FileDown size={20} />
           </button>
-          <button onClick={() => supabase.auth.signOut()} className="p-2 bg-slate-100 hover:bg-red-500 hover:text-white rounded-lg transition-all text-slate-600">
+          <button onClick={() => guestMode ? setGuestMode(false) : supabase.auth.signOut()} className="p-2 bg-slate-100 hover:bg-red-500 hover:text-white rounded-lg transition-all text-slate-600">
             <LogOut size={20} />
           </button>
         </div>
@@ -250,6 +250,7 @@ const App = () => {
         onDrop={handleDrop}
         onExportOpen={() => setIsExportModalOpen(true)}
         onMobileMenuClose={() => setIsMobileMenuOpen(false)}
+        onSignOut={() => guestMode ? setGuestMode(false) : supabase.auth.signOut()}
       />
 
       {/* 데스크탑 리사이저 */}
