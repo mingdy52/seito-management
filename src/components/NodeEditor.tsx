@@ -84,7 +84,7 @@ export const NodeEditor: React.FC<NodeEditorProps> = ({
         <button onClick={() => onDelete(selectedNode.id)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-white rounded-lg transition-colors"><Trash2 size={20} /></button>
       </div>
 
-      <div className="bg-white p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-sm md:shadow-lg border border-slate-200 space-y-6 md:space-y-8 relative overflow-hidden">
+      <div className="bg-white p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-sm md:shadow-lg border border-slate-200 space-y-6 md:space-y-8 relative">
         <div>
           <label className="block text-[10px] md:text-xs font-bold text-slate-400 mb-2 md:mb-3 uppercase">{selectedInfo.titleLabel}</label>
           <input className="w-full p-3 md:p-4 rounded-xl md:rounded-2xl border bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none text-lg md:text-xl font-bold transition-all" value={selectedNode.title || ''} onChange={(e) => onUpdate(selectedNode.id, { title: e.target.value })} onBlur={() => onFieldBlur(selectedNode.id, 'title')} />

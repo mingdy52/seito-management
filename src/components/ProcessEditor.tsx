@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, FileText, Sparkles, X, UploadCloud, LinkIcon, Image as ImageIcon } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Box, FileText, Sparkles, X, UploadCloud, LinkIcon, Image as ImageIcon, Search } from 'lucide-react';
 import { TreeNode } from '../types';
 
 interface ProcessEditorProps {
@@ -15,6 +15,25 @@ interface ProcessEditorProps {
 export const ProcessEditor: React.FC<ProcessEditorProps> = ({
   node, allNodes, onUpdate, onImageUpload, onFieldBlur, onSelectNode, findNodeById,
 }) => {
+  const [linkSearch, setLinkSearch] = useState('');
+  const [linkDropdownOpen, setLinkDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setLinkDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const linkCandidates = allNodes
+    .filter(n => n.level >= 3 && n.id !== node.id && !(node.links || []).includes(n.id))
+    .filter(n => !linkSearch || n.label.toLowerCase().includes(linkSearch.toLowerCase()));
+
   return (
     <>
       <div className="space-y-6 md:space-y-8 animate-in fade-in duration-300">
@@ -92,24 +111,44 @@ export const ProcessEditor: React.FC<ProcessEditorProps> = ({
           })}
         </div>
 
-        <select
-          className="w-full p-3 md:p-4 rounded-xl border bg-slate-50 hover:bg-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none text-sm md:text-base font-bold text-slate-400 hover:text-slate-600 transition-all cursor-pointer"
-          value=""
-          onChange={(e) => {
-            if (e.target.value) {
-              const newLinks = [...(node.links || []), e.target.value];
-              onUpdate(node.id, { links: newLinks });
-            }
-          }}
-        >
-          <option value="">+ 클릭해서 연결할 항목 찾기...</option>
-          {allNodes
-            .filter(n => n.level >= 3 && n.id !== node.id && !(node.links || []).includes(n.id))
-            .map(n => (
-              <option key={n.id} value={n.id}>{n.label}</option>
-            ))
-          }
-        </select>
+        <div ref={dropdownRef} className="relative">
+          <div
+            className="w-full p-3 md:p-4 rounded-xl border bg-slate-50 hover:bg-slate-100 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10 flex items-center gap-2 cursor-pointer transition-all"
+            onClick={() => { setLinkDropdownOpen(true); setTimeout(() => inputRef.current?.focus(), 0); }}
+          >
+            <Search size={16} className="text-slate-400 shrink-0" />
+            <input
+              ref={inputRef}
+              type="text"
+              className="w-full bg-transparent outline-none text-sm md:text-base font-bold text-slate-600 placeholder:text-slate-400"
+              placeholder="검색하여 연결할 항목 찾기..."
+              value={linkSearch}
+              onChange={(e) => { setLinkSearch(e.target.value); setLinkDropdownOpen(true); }}
+              onFocus={() => setLinkDropdownOpen(true)}
+            />
+          </div>
+          {linkDropdownOpen && (
+            <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+              {linkCandidates.length === 0 ? (
+                <div className="p-3 text-sm text-slate-400 text-center">검색 결과 없음</div>
+              ) : (
+                linkCandidates.map(n => (
+                  <button
+                    key={n.id}
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-700 transition-colors truncate"
+                    onClick={() => {
+                      onUpdate(node.id, { links: [...(node.links || []), n.id] });
+                      setLinkSearch('');
+                      setLinkDropdownOpen(false);
+                    }}
+                  >
+                    {n.label}
+                  </button>
+                ))
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </>
   );
