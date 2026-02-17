@@ -15,24 +15,12 @@ import { NodeEditor } from './components/NodeEditor';
 import { Dashboard } from './components/Dashboard';
 import { ExportModal } from './components/ExportModal';
 
-const INITIAL_DATA: TreeNode = {
-  id: 'system_root',
-  level: -1,
-  children: [
-    { id: 'root', title: '세이토', level: 0, isOpen: true, children: [
-      { id: '1', title: '담당자 성함', level: 1, isOpen: false, children: [] },
-    ]},
-  ],
-};
-
 const App = () => {
   const { user, loading } = useAuth();
-  const [guestMode, setGuestMode] = useState(false);
-  const { data: syncData, setData: setSyncData, saveStatus } = useSupabaseSync(guestMode ? null : user);
-  const [localData, setLocalData] = useState<TreeNode | null>(INITIAL_DATA);
+  const { data: syncData, setData: setSyncData, saveStatus } = useSupabaseSync(user);
 
-  const data = guestMode ? (localData ?? INITIAL_DATA) : syncData;
-  const setData = guestMode ? setLocalData : setSyncData;
+  const data = syncData;
+  const setData = setSyncData;
   const { leftWidth, startResizing } = useResizable(30);
 
   const [selectedNodeId, setSelectedNodeId] = useState('root');
@@ -152,7 +140,7 @@ const App = () => {
   };
 
   const logActivity = useCallback(async (nodeId: string, field: string) => {
-    if (!user || guestMode || !data) return;
+    if (!user || !data) return;
     const node = findNode(data, nodeId);
     if (!node) return;
     const nodeTitle = node.title || '이름 없음';
@@ -187,7 +175,7 @@ const App = () => {
         field_label: fieldLabel,
       });
     }
-  }, [user, guestMode, data]);
+  }, [user, data]);
 
   const handleFieldBlur = useCallback((nodeId: string, field: string) => {
     logActivity(nodeId, field);
@@ -199,7 +187,7 @@ const App = () => {
   };
 
   if (loading) return <LoadingScreen />;
-  if (!user && !guestMode) return <AuthScreen onGuestMode={() => setGuestMode(true)} />;
+  if (!user) return <AuthScreen />;
   if (!data) return <LoadingScreen />;
 
   const selectedNode = findNode(data, selectedNodeId);
@@ -220,7 +208,7 @@ const App = () => {
           <button onClick={() => setIsExportModalOpen(true)} className="p-2 bg-slate-100 hover:bg-blue-600 hover:text-white rounded-lg transition-all text-slate-600">
             <FileDown size={20} />
           </button>
-          <button onClick={() => guestMode ? setGuestMode(false) : supabase.auth.signOut()} className="p-2 bg-slate-100 hover:bg-red-500 hover:text-white rounded-lg transition-all text-slate-600">
+          <button onClick={() => supabase.auth.signOut()} className="p-2 bg-slate-100 hover:bg-red-500 hover:text-white rounded-lg transition-all text-slate-600">
             <LogOut size={20} />
           </button>
         </div>
@@ -250,7 +238,7 @@ const App = () => {
         onDrop={handleDrop}
         onExportOpen={() => setIsExportModalOpen(true)}
         onMobileMenuClose={() => setIsMobileMenuOpen(false)}
-        onSignOut={() => guestMode ? setGuestMode(false) : supabase.auth.signOut()}
+        onSignOut={() => supabase.auth.signOut()}
       />
 
       {/* 데스크탑 리사이저 */}

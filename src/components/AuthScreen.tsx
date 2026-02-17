@@ -11,11 +11,7 @@ const toEmail = (username: string) => {
   return `u${encoded}@seito.app`;
 };
 
-interface AuthScreenProps {
-  onGuestMode?: () => void;
-}
-
-export const AuthScreen: React.FC<AuthScreenProps> = ({ onGuestMode }) => {
+export const AuthScreen: React.FC = () => {
   const [mode, setMode] = useState<AuthMode>('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -156,14 +152,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onGuestMode }) => {
             </button>
           </form>
 
-          {onGuestMode && (
-            <button
-              onClick={onGuestMode}
-              className="w-full mt-4 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
-            >
-              로그인 없이 둘러보기
-            </button>
-          )}
         </div>
       </div>
     </div>
