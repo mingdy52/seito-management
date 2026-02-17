@@ -23,13 +23,14 @@ interface SidebarProps {
   onExportOpen: () => void;
   onMobileMenuClose: () => void;
   onSignOut: () => void;
+  username: string;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   data, selectedNodeId, draggedNodeId, saveStatus, leftWidth,
   isMobile, isMobileMenuOpen, activeTab, onTabChange,
   onSelect, onToggle, onAdd, onDragStart, onDragOver, onDrop,
-  onExportOpen, onMobileMenuClose, onSignOut,
+  onExportOpen, onMobileMenuClose, onSignOut, username,
 }) => {
   const treeProps = { selectedNodeId, draggedNodeId, onSelect, onToggle, onAdd, onDragStart, onDragOver, onDrop };
 
@@ -43,7 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="flex flex-col gap-3 mb-6 shrink-0">
         <div className="flex items-center justify-between">
           <h1 className="text-base font-bold flex items-center gap-1.5 text-slate-800 hidden md:flex">
-            <Layout className="text-blue-600" size={18} /> 세이토 빌더
+            <Layout className="text-blue-600" size={18} /> 세이토
           </h1>
           <div className="md:hidden flex items-center gap-2 font-bold text-slate-800">
             <FolderTree className="text-blue-600" size={18} /> 목차
@@ -99,19 +100,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      <div className="pt-3 border-t border-slate-100 flex items-center justify-between shrink-0">
-        <span className="text-xs font-bold text-slate-400">상태</span>
-        <div className="flex items-center gap-2">
-          {saveStatus === 'saving' ? (
-            <span className="text-[10px] text-blue-500 font-bold animate-pulse"><CloudUpload size={12} className="inline mr-1"/> 저장중</span>
-          ) : saveStatus === 'saved' ? (
-            <span className="text-[10px] text-emerald-500 font-bold"><Check size={12} className="inline mr-1"/> 동기화됨</span>
-          ) : (
-            <span className="text-[10px] text-slate-400 font-bold"><Cloud size={12} className="inline mr-1"/> 대기중</span>
-          )}
-          <button onClick={onSignOut} className="hidden md:block p-1.5 hover:bg-red-500 hover:text-white rounded-lg transition-all text-slate-400">
+      <div className="pt-3 border-t border-slate-100 shrink-0 space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+              {username.charAt(0).toUpperCase()}
+            </div>
+            <span className="text-xs font-bold text-slate-600 truncate">{username}</span>
+          </div>
+          <button onClick={onSignOut} className="hidden md:block p-1.5 hover:bg-red-500 hover:text-white rounded-lg transition-all text-slate-400 shrink-0">
             <LogOut size={14} />
           </button>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold text-slate-400">저장 상태</span>
+          {saveStatus === 'saving' ? (
+            <span className="text-[10px] text-blue-500 font-bold animate-pulse"><CloudUpload size={12} className="inline mr-1"/>저장중</span>
+          ) : saveStatus === 'saved' ? (
+            <span className="text-[10px] text-emerald-500 font-bold"><Check size={12} className="inline mr-1"/>동기화됨</span>
+          ) : (
+            <span className="text-[10px] text-slate-400 font-bold"><Cloud size={12} className="inline mr-1"/>대기중</span>
+          )}
         </div>
       </div>
     </div>

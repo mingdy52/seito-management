@@ -239,6 +239,7 @@ const App = () => {
         onExportOpen={() => setIsExportModalOpen(true)}
         onMobileMenuClose={() => setIsMobileMenuOpen(false)}
         onSignOut={() => supabase.auth.signOut()}
+        username={user.user_metadata?.username || user.email || '사용자'}
       />
 
       {/* 데스크탑 리사이저 */}
