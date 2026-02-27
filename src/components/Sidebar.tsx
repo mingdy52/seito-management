@@ -27,7 +27,7 @@ interface SidebarProps {
 }
 
 const filterTree = (node: TreeNode, term: string): TreeNode | null => {
-  const matches = node.title.toLowerCase().includes(term.toLowerCase());
+  const matches = node.title?.toLowerCase().includes(term.toLowerCase()) ?? false;
   
   if (node.children && node.children.length > 0) {
     const filteredChildren = node.children
